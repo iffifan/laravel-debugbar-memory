@@ -1,0 +1,10 @@
+{
+    "name": "iffifan/laravel-debugbar-memory",
+    "description": "Add detailed memory usage measurement for code blocks in laravel debugbar",
+    "type": "library",
+    "require": {
+        "barryvdh/laravel-debugbar": ">=2.4"
+    },
+    "license": "MIT",
+    "minimum-stability": "dev"
+}
