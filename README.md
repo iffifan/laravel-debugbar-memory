@@ -43,3 +43,11 @@ Let's calculate memory usage of a while loop with helper methods
 Memory calculation will be updated like this:
 
 ![Screenshot](https://i.ibb.co/gryfYkY/debugbar-memory-code.jpg)
+
+## Disable
+
+Just add 
+```php
+        'memory_details'  => false, //Display memory details
+```
+in ``config/debugbar.php``
