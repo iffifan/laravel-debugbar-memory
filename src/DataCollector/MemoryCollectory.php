@@ -1,12 +1,17 @@
 <?php
 
-namespace Iffian\MemoryDebugbar\DataCollector;
+namespace Iffifan\MemoryDebugbar\DataCollector;
 
 use Closure;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 use DebugBar\DebugBarException;
 
+/**
+ * Class MemoryDataCollector
+ *
+ * @package Iffifan\MemoryDebugbar\DataCollector
+ */
 class MemoryDataCollector extends DataCollector implements Renderable
 {
 
