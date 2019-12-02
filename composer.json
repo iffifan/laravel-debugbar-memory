@@ -7,7 +7,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Iffifan\\MemoryDebugbar\\": "src/"
+            "Iffifan\\MemoryDebugbar\\": "src/",
+            "Iffifan\\MemoryDebugbar\\Tests\\": "tests/"
         },
         "files": [
             "src/helpers.php"
