@@ -19,6 +19,12 @@ class MemoryDebugbarServiceprovider extends ServiceProvider
         $debugbar = $this->app->make(LaravelDebugbar::class);
         if ($debugbar->shouldCollect('memory_details', true)) {
             $debugbar->addCollector(new MemoryDataCollector());
+            $this->app->booted(
+                static function () use ($debugbar) {
+                    $debugbar['memory_details']->addMeasure('Booting', 0, memory_get_peak_usage(false));
+                    $debugbar['memory_details']->startMeasure('Application');
+                }
+            );
         }
-}
+    }
 }

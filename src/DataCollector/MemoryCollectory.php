@@ -16,16 +16,6 @@ class MemoryDataCollector extends DataCollector implements Renderable
 {
 
     /**
-     * @var float
-     */
-    protected $requestStartMemory;
-
-    /**
-     * @var float
-     */
-    protected $requestEndMemory;
-
-    /**
      * @var array
      */
     protected $startedMeasures = [];
@@ -38,11 +28,9 @@ class MemoryDataCollector extends DataCollector implements Renderable
 
     protected $realUsage = false;
 
-    protected $peakUsage = 0;
-
     /**
      * Returns whether total allocated memory page size is used instead of actual used memory size
-     * by the application.  See $real_usage parameter on memory_get_usage for details.
+     * by the application.  See $real_usage parameter on memory_get_peak_usage for details.
      *
      * @return bool
      */
@@ -53,7 +41,7 @@ class MemoryDataCollector extends DataCollector implements Renderable
 
     /**
      * Sets whether total allocated memory page size is used instead of actual used memory size
-     * by the application.  See $real_usage parameter on memory_get_usage for details.
+     * by the application.  See $real_usage parameter on memory_get_peak_usage for details.
      *
      * @param bool $realUsage
      */
@@ -63,37 +51,16 @@ class MemoryDataCollector extends DataCollector implements Renderable
     }
 
     /**
-     * Returns the peak memory usage
-     *
-     * @return integer
-     */
-    public function getPeakUsage()
-    {
-        return $this->peakUsage;
-    }
-
-    /**
-     * Updates the peak memory usage value
-     */
-    public function updatePeakUsage()
-    {
-        $this->peakUsage = memory_get_usage($this->realUsage);
-    }
-
-    /**
      * Starts a measure
      *
      * @param string $name Internal name, used to stop the measure
      * @param string|null $label Public name
-     * @param string|null $collector The source of the collector
      */
-    public function startMeasure($name, $label = null, $collector = null)
+    public function startMeasure($name, $label = null)
     {
-        $start = memory_get_usage(true);
+        $start = memory_get_peak_usage($this->realUsage);
         $this->startedMeasures[$name] = [
-            'label' => $label ?: $name,
-            'start' => $start,
-            'collector' => $collector
+            'start' => $start
         ];
     }
 
@@ -112,21 +79,18 @@ class MemoryDataCollector extends DataCollector implements Renderable
      * Stops a measure
      *
      * @param string $name
-     * @param array $params
      * @throws DebugBarException
      */
-    public function stopMeasure($name, $params = [])
+    public function stopMeasure($name)
     {
-        $end = memory_get_usage(true);
+        $end = memory_get_peak_usage($this->realUsage);
         if (!$this->hasStartedMeasure($name)) {
             throw new DebugBarException("Failed stopping measure '$name' because it hasn't been started");
         }
         $this->addMeasure(
-            $this->startedMeasures[$name]['label'],
+            $name,
             $this->startedMeasures[$name]['start'],
-            $end,
-            $params,
-            $this->startedMeasures[$name]['collector']
+            $end
         );
         unset($this->startedMeasures[$name]);
     }
@@ -137,21 +101,12 @@ class MemoryDataCollector extends DataCollector implements Renderable
      * @param string $label
      * @param float $start
      * @param float $end
-     * @param array $params
-     * @param string|null $collector
      */
-    public function addMeasure($label, $start, $end, $params = [], $collector = null)
+    public function addMeasure($label, $start, $end)
     {
-        $this->measures[] = [
-            'label' => $label,
+        $this->measures[$label] = [
             'start' => $start,
-            'relative_start' => $start - $this->requestStartMemory,
             'end' => $end,
-            'relative_end' => $end - $this->requestEndMemory,
-            'duration' => $end - $start,
-            'duration_str' => $this->getDataFormatter()->formatBytes($end - $start),
-            'params' => $params,
-            'collector' => $collector
         ];
     }
 
@@ -183,65 +138,20 @@ class MemoryDataCollector extends DataCollector implements Renderable
     }
 
     /**
-     * Returns the request start memory
-     *
-     * @return float
-     */
-    public function getRequestStartMemory()
-    {
-        return $this->requestStartMemory;
-    }
-
-    /**
-     * Returns the request end memory
-     *
-     * @return float
-     */
-    public function getRequestEndMemory()
-    {
-        return $this->requestEndMemory;
-    }
-
-    /**
-     * Returns the duration of a request
-     *
-     * @return float
-     */
-    public function getRequestDuration()
-    {
-        if ($this->requestEndMemory !== null) {
-            return $this->requestEndMemory - $this->requestStartMemory;
-        }
-        return memory_get_usage(true) - $this->requestStartMemory;
-    }
-
-    /**
      * @return array
      * @throws DebugBarException
      */
     public function collect()
     {
-        $this->updatePeakUsage();
-        $this->requestEndMemory = memory_get_usage(true);
         foreach (array_keys($this->startedMeasures) as $name) {
             $this->stopMeasure($name);
         }
-
-        usort($this->measures, function ($a, $b) {
-            if ($a['start'] == $b['start']) {
-                return 0;
-            }
-            return $a['start'] < $b['start'] ? -1 : 1;
-        });
-
+        $measures = [];
+        foreach ($this->measures as $name => $measure) {
+            $measures[$name] = $this->getDataFormatter()->formatBytes($measure['end'] - $measure['start']);
+        }
         return [
-            'start' => $this->requestStartMemory,
-            'end' => $this->requestEndMemory,
-            'duration' => $this->getRequestDuration(),
-            'duration_str' => $this->getDataFormatter()->formatBytes($this->getRequestDuration()),
-            'peak_usage' => $this->peakUsage,
-            'peak_usage_str' => $this->getDataFormatter()->formatBytes($this->peakUsage),
-            'measures' => array_values($this->measures)
+            'measures' => $measures
         ];
     }
 
@@ -262,8 +172,8 @@ class MemoryDataCollector extends DataCollector implements Renderable
             "memory_details" => [
                 "icon" => "tasks",
                 "title" => "Memory",
-                "widget" => "PhpDebugBar.Widgets.TimelineWidget",
-                "map" => "memory_details",
+                "widget" => "PhpDebugBar.Widgets.HtmlVariableListWidget",
+                "map" => "memory_details.measures",
                 "default" => "{}"
             ]
         ];

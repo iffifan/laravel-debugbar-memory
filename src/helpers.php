@@ -9,13 +9,9 @@ if (!function_exists('start_memory_measure')) {
      */
     function start_memory_measure($name, $label = null)
     {
-        try {
-            debugbar()
-                ->getCollector('memory_details')
-                ->startMeasure($name, $label);
-        } catch (\DebugBar\DebugBarException $exception) {
-            report($exception);
-        }
+        debugbar()
+            ->getCollector('memory_details')
+            ->startMeasure($name, $label);
     }
 }
 
@@ -27,12 +23,8 @@ if (!function_exists('stop_memory_measure')) {
      */
     function stop_memory_measure($name)
     {
-        try {
-            debugbar()
-                ->getCollector('memory_details')
-                ->stopMeasure($name);
-        } catch (\DebugBar\DebugBarException $exception) {
-            report($exception);
-        }
+        debugbar()
+            ->getCollector('memory_details')
+            ->stopMeasure($name);
     }
 }
