@@ -8,7 +8,10 @@
     "autoload": {
         "psr-4": {
             "Iffifan\\MemoryDebugbar\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {
