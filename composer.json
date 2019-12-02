@@ -5,6 +5,18 @@
     "require": {
         "barryvdh/laravel-debugbar": ">=2.4"
     },
+    "autoload": {
+        "psr-4": {
+            "Iffifan\\MemoryDebugbar\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Iffifan\\MemoryDebugbar\\Providers\\MemoryDebugbarServiceProvider"
+            ]
+        }
+    },
     "license": "MIT",
     "minimum-stability": "dev"
 }
