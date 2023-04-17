@@ -1,5 +1,5 @@
 {
-    "name": "iffifan/laravel-debugbar-memory",
+    "name": "biohazard/laravel-debugbar-memory",
     "description": "Add detailed memory usage measurement for code blocks in laravel debugbar",
     "type": "library",
     "require": {
