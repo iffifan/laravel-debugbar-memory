@@ -9,7 +9,7 @@ use Illuminate\Support\ServiceProvider;
  *
  * @package Iffifan\MemoryDebugbar\Providers
  */
-class MemoryDebugbarServiceprovider extends ServiceProvider
+class MemoryDebugbarServiceProvider extends ServiceProvider
 {
     /**
      * Register services
