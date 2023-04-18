@@ -10,7 +10,7 @@ Add detailed memory usage measurement for code blocks in [Laravel Debugbar](http
 Require this package with composer. It is recommended to only require the package for development.
 
 ```shell
-composer require iffifan/laravel-debugbar-memory --dev
+composer require biohazard/laravel-debugbar-memory --dev
 ```
 
 Laravel 5.5 uses Package Auto-Discovery, so doesn't require you to manually add the ServiceProvider.
